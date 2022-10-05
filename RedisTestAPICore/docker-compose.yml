@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+    master:
+        image: redis:3
+        command: --maxmemory 10000000 --maxmemory-policy noeviction
+    slave:
+        image: redis:3
+        command: redis-server --slaveof redis-master 6379 --maxmemory 10000000 --maxmemory-policy allkeys-lfu
+        links:
+        - master:redis-master
+
+    sentinel:
+        build: 
+            context: sentinel
+            dockerfile: Dockerfile
+        environment:
+        - SENTINEL_DOWN_AFTER=5000
+        - SENTINEL_FAILOVER=5000    
+        links:
+        - master:redis-master
+        - slave
+
+    redistestapicore:
+        image: ${DOCKER_REGISTRY-}redistestapicore
+        ports:
+            - "9901:80"
+        build:
+            context: .
+            dockerfile: Dockerfile
+        depends_on: 
+            - master 
+            - slave
+            - sentinel
+            
+volumes:
+  master:
+    driver: local
+  slave:
+    driver: local

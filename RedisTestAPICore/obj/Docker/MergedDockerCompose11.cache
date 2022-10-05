@@ -1,0 +1,61 @@
+name: dockercompose5792428757993724724
+services:
+  master:
+    command:
+    - --maxmemory
+    - "1000000"
+    - --maxmemory-policy
+    - noeviction
+    image: redis:3
+    networks:
+      default: null
+  redistestapicore:
+    build:
+      context: D:\GITHub\redis-test-app\redis-test-app\RedisTestAPICore
+      dockerfile: Dockerfile
+    depends_on:
+      master:
+        condition: service_started
+      sentinel:
+        condition: service_started
+      slave:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    image: redistestapicore
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 80
+      protocol: tcp
+  sentinel:
+    build:
+      context: D:\GITHub\redis-test-app\redis-test-app\RedisTestAPICore\sentinel
+      dockerfile: Dockerfile
+    environment:
+      SENTINEL_DOWN_AFTER: "5000"
+      SENTINEL_FAILOVER: "5000"
+    links:
+    - master:redis-master
+    - slave
+    networks:
+      default: null
+  slave:
+    command:
+    - redis-server
+    - --slaveof
+    - redis-master
+    - "6379"
+    - --maxmemory
+    - "1000000"
+    - --maxmemory-policy
+    - noeviction
+    image: redis:3
+    links:
+    - master:redis-master
+    networks:
+      default: null
+networks:
+  default:
+    name: dockercompose5792428757993724724_default

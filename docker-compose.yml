@@ -1,0 +1,16 @@
+master:
+  image: redis:3
+  command: --maxmemory 1000000 --maxmemory-policy noeviction
+slave:
+  image: redis:3
+  command: redis-server --slaveof redis-master 6379 --maxmemory 1000000 --maxmemory-policy noeviction
+  links:
+    - master:redis-master
+sentinel:
+  build: sentinel
+  environment:
+    - SENTINEL_DOWN_AFTER=5000
+    - SENTINEL_FAILOVER=5000    
+  links:
+    - master:redis-master
+    - slave

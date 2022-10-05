@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "DhO0v+a41chvLKbGNGNeU4Z/wt0rXAwwlD/wczejRdg=",
+  "Source": "RedisTestAPICore",
+  "BasePath": "_content/RedisTestAPICore",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
